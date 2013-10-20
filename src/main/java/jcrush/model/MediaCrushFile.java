@@ -2,7 +2,8 @@ package jcrush.model;
 
 public class MediaCrushFile {
     private String hash;
-    private float compression;
+    private FileStatus status;
+    private double compression;
     private String original;
     private String type;
     private FileType fileType;
@@ -11,7 +12,7 @@ public class MediaCrushFile {
 
     private MediaCrushFile() { }
 
-    public float getCompression() {
+    public double getCompression() {
         return compression;
     }
 
@@ -29,5 +30,9 @@ public class MediaCrushFile {
 
     public String getHash() {
         return hash;
+    }
+
+    public FileStatus getStatus() {
+        return status == null ? FileStatus.DONE : status;
     }
 }

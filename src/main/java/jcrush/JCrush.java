@@ -7,15 +7,25 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import jcrush.io.ConnectionType;
 import jcrush.io.Requester;
+import jcrush.model.CrushedFile;
+import jcrush.model.FileStatus;
 import jcrush.model.MediaCrushFile;
 import jcrush.system.Validator;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Type;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 
+/**
+ * Static methods that expose the MediaCrush API
+ */
 public class JCrush {
     private static final Gson GSON;
 
@@ -112,9 +122,97 @@ public class JCrush {
         return array;
     }
 
-    public static void setHash(MediaCrushFile file, String hash) throws NoSuchFieldException, IllegalAccessException {
+    public static boolean doesExists(String hash) throws IOException {
+        Validator.validateNotNull(hash, "hash");
+
+        URL uri = new URL(MEDIA_CRUSH_URL + API_DIRECTORY + hash + "/exists");
+        Requester requester = new Requester(ConnectionType.GET, uri);
+        requester.setRecieve(true);
+        try {
+            requester.connect();
+        } catch (FileNotFoundException ignored) {
+            return false;
+        }
+
+        String json = requester.getResponse();
+        Validator.validateNot404(json);
+
+        Map temp = GSON.fromJson(json, Map.class);
+
+        return (Boolean)temp.get("exists");
+    }
+
+    public static MediaCrushFile getFileStatus(String hash) throws IOException {
+        Validator.validateNotNull(hash, "hash");
+
+        URL uri = new URL(MEDIA_CRUSH_URL + API_DIRECTORY + hash + "/status");
+        Requester requester = new Requester(ConnectionType.GET, uri);
+        requester.setRecieve(true);
+        requester.connect();
+
+        String json = requester.getResponse();
+        Validator.validateNot404(json);
+
+        Map map = GSON.fromJson(json, Map.class);
+
+        String statusString = (String) map.get("status");
+
+        try {
+            MediaCrushFile file = convertMapToFile((Map) map.get(hash));
+            setHash(file, hash);
+            setStatus(file, FileStatus.toFileStatus(statusString));
+
+            return file;
+        } catch (NoSuchFieldException e) {
+            throw new IOException("Error creating MediaCrushFile", e);
+        } catch (IllegalAccessException e) {
+            throw new IOException("Error creating MediaCrushFile", e);
+        } catch (InstantiationException e) {
+            throw new IOException("Error creating MediaCrushFile", e);
+        } catch (NoSuchMethodException e) {
+            throw new IOException("Error creating MediaCrushFile", e);
+        } catch (InvocationTargetException e) {
+            throw new IOException("Error creating MediaCrushFile", e);
+        }
+    }
+
+    private static void setHash(MediaCrushFile file, String hash) throws NoSuchFieldException, IllegalAccessException {
         Field f = file.getClass().getDeclaredField("hash");
         f.setAccessible(true);
         f.set(file, hash);
+    }
+
+    private static void setStatus(MediaCrushFile file, FileStatus status) throws NoSuchFieldException, IllegalAccessException {
+        Field f = file.getClass().getDeclaredField("status");
+        f.setAccessible(true);
+        f.set(file, status);
+    }
+
+    //oh sweet jesus
+    private static MediaCrushFile convertMapToFile(Map map) throws IllegalAccessException, InstantiationException, NoSuchMethodException, InvocationTargetException, NoSuchFieldException {
+        Constructor<?> _construct = MediaCrushFile.class.getDeclaredConstructors()[0];
+        _construct.setAccessible(true);
+        MediaCrushFile file = (MediaCrushFile) _construct.newInstance();
+        for (Object key : map.keySet()) {
+            if (key.equals("files")) {
+                ArrayList<Map> files = (ArrayList<Map>) map.get(key);
+                ArrayList<CrushedFile> crushedFiles = new ArrayList<CrushedFile>();
+                for (Map m : files) {
+                    CrushedFile c = new CrushedFile((String)m.get("file"), (String)m.get("type"));
+                    crushedFiles.add(c);
+                }
+                Field f = MediaCrushFile.class.getDeclaredField("files");
+                f.setAccessible(true);
+                f.set(file, crushedFiles.toArray(new CrushedFile[crushedFiles.size()]));
+            } else {
+                try {
+                    Field f = MediaCrushFile.class.getDeclaredField(key.toString());
+                    f.setAccessible(true);
+                    f.set(file, map.get(key));
+                } catch (NoSuchFieldException ignored) { }
+            }
+        }
+
+        return file;
     }
 }
