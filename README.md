@@ -132,20 +132,23 @@ Exposes:
   FileStatus = file.getStatus(); //Returns a jcrush.model.FileStatus enum
 ```
 
+Notes: This is a convenience method. It returns a MediaCrushFile object with all info attached and does not throw an exception 
+when the file does not exist. When the hash specified does not exist, this method simply returns null. However, an exception
+may be thrown if the server responds in an abnormal way.
+
+###getFiles (convenience method)
 You can also add unlimited parameters using the getFileInfos method
 ```java
-  try {
-      MediaCrushFile[] files = JCrush.getFiles("CPvuR5lRhmS0", "tVWMM_ziA3nm", ...);
-  } catch (IOException e) {
-      //File retrieval failed..
-	  return;
-  }
+  MediaCrushFile[] files = JCrush.getFiles("CPvuR5lRhmS0", "tVWMM_ziA3nm", ...);
 ```
 
-Notes: These are a convenience method. They return a MediaCrushFile object with all info attached and does not throw an exception 
-when the file does not exist. When the hash specified does not exist, this method simply returns null.
-However, in getFile, an exception can be thrown if the server responded in an abnormal way. BUT, getFiles never throws an exception, it simply sets the file to null.
+Notes: This is a convenience method. It returns an array of MediaCrushFile objects with all info attached and does not throw an exception 
+when the file does not exist. It allows infinate amount of parameters, and also allows a String array to be passed. 
+When one of the hash's specified does not exist, it's value in the array is just set to null. Unlike the getFile method, this method never
+throws an exception, if an exception was thrown, then it's value in the array is set to null.
 
 
 [1]: https://github.com/MediaCrush/MediaCrush
 [2]: https://mediacru.sh/docs/API
+[3]: https://github.com/hypereddie10/jCrush#getfile-convenience-method
+[4]: https://github.com/hypereddie10/jCrush#getfiles-convenience-method
