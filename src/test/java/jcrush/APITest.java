@@ -1,12 +1,50 @@
 package jcrush;
 
 import jcrush.model.MediaCrushFile;
+import java.io.File;
 import org.junit.Test;
 
 import java.io.IOException;
 
 public class APITest {
     private static final String TEST_HASH = "CPvuR5lRhmS0";
+
+
+    @Test(expected = IOException.class)
+    public void failedUploadFileTest() throws IOException {
+        System.out.println("=== JCrush.uploadFile(File) ===");
+
+        File testFile = new File("failedTest.gif");
+        JCrush.uploadFile(testFile);
+        System.out.println("TEST COMPLETE");
+    }
+
+    @Test
+    public void uploadAndDeleteFile() throws IOException {
+        System.out.println("=== JCrush.uploadFile(File) ===");
+        System.out.println("=== JCrush.delete(String) ===");
+
+        File testFile = new File("test.gif");
+        String hash = JCrush.uploadFile(testFile);
+        JCrush.delete(hash);
+        System.out.println("TEST COMPLETE");
+    }
+
+    @Test(expected = IOException.class)
+    public void failedDeleteHashTest() throws IOException {
+        System.out.println("=== JCrush.delete(String) ===");
+
+        JCrush.delete(TEST_HASH);
+    }
+
+    @Test(expected = IOException.class)
+    public void failedDeleteFileTest() throws IOException {
+        System.out.println("=== JCrush.delete(MediaCrushFile) ===");
+
+        MediaCrushFile file = JCrush.getFile(TEST_HASH);
+
+        JCrush.delete(file);
+    }
 
     @Test
     public void fileStatusTest() throws Exception {

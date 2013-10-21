@@ -2,10 +2,7 @@ package jcrush.io;
 
 import static jcrush.system.Constants.DEFAULT_USER_AGENT;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
+import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.HashMap;
@@ -13,6 +10,8 @@ import java.util.List;
 import java.util.Map;
 
 public class Requester {
+    private boolean ignoreResponse;
+    private int code;
     private URL url;
     private HashMap<String, String> property = new HashMap<String, String>();
     HttpURLConnection connection;
@@ -80,10 +79,10 @@ public class Requester {
     public String getResponse() {
         if (!isConnected())
             throw new IllegalStateException(
-                    "This FlankConnection is not connected!");
+                    "This Requester is not connected!");
         if (!input)
             throw new IllegalStateException(
-                    "This FlankConnection is not set to recieve input!");
+                    "This Requester is not set to recieve input!");
         return response;
     }
 
@@ -132,9 +131,10 @@ public class Requester {
         }
         if (output) connection.getOutputStream().write(post);
         if (input) {
-            if (connection.getResponseCode() == HttpURLConnection.HTTP_UNAVAILABLE) {
+            code  = connection.getResponseCode();
+            if (!ignoreResponse && code == HttpURLConnection.HTTP_UNAVAILABLE) {
                 throw new IOException("The server is unavailable!");
-            } else if (connection.getResponseCode() == HttpURLConnection.HTTP_FORBIDDEN) {
+            } else if (!ignoreResponse && code == HttpURLConnection.HTTP_FORBIDDEN) {
                 BufferedReader read = new BufferedReader(new InputStreamReader(
                         connection.getErrorStream()));
                 StringBuilder builder = new StringBuilder(100);
@@ -158,10 +158,22 @@ public class Requester {
         isconnected = true;
     }
 
+    public InputStream getErrorStream() {
+        return connection.getErrorStream();
+    }
+
+    public int getResponseCode() {
+        return code;
+    }
+
+    public void setIgnoreResponse(boolean value) {
+        ignoreResponse = value;
+    }
+
     public Map<String, List<String>> getHeaderFields() {
         if (!isConnected())
             throw new IllegalStateException(
-                    "This FlankConnection is not connected!");
+                    "This Requester is not connected!");
         return connection.getHeaderFields();
     }
 
