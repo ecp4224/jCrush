@@ -110,6 +110,7 @@ Exposes https://github.com/MediaCrush/MediaCrush/blob/master/docs/api.md#apihash
 
 ###getFile (convenience method)
 Exposes:
+    
     https://github.com/MediaCrush/MediaCrush/blob/master/docs/api.md#apihash
     https://github.com/MediaCrush/MediaCrush/blob/master/docs/api.md#apihashstatus
     https://github.com/MediaCrush/MediaCrush/blob/master/docs/api.md#apihashexists
@@ -137,7 +138,11 @@ when the file does not exist. When the hash specified does not exist, this metho
 may be thrown if the server responds in an abnormal way.
 
 ###getFiles (convenience method)
-You can also add unlimited parameters using the getFileInfos method
+Exposes:
+    
+    https://github.com/MediaCrush/MediaCrush/blob/master/docs/api.md#apihash
+    https://github.com/MediaCrush/MediaCrush/blob/master/docs/api.md#apihashstatus
+    https://github.com/MediaCrush/MediaCrush/blob/master/docs/api.md#apihashexists
 ```java
   MediaCrushFile[] files = JCrush.getFiles("CPvuR5lRhmS0", "tVWMM_ziA3nm", ...);
 ```
