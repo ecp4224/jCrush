@@ -41,7 +41,7 @@ public class APITest {
     public void failedDeleteFileTest() throws IOException {
         System.out.println("=== JCrush.delete(MediaCrushFile) ===");
 
-        MediaCrushFile file = JCrush.getFile(TEST_HASH);
+        MediaCrushFile file = JCrush.getFileInfo(TEST_HASH);
 
         JCrush.delete(file);
     }
@@ -71,8 +71,8 @@ public class APITest {
     }
     @Test
     public void fileTest() throws IOException {
-        System.out.println("=== JCrush.getFile(String) ===");
-        MediaCrushFile m = JCrush.getFile(TEST_HASH);
+        System.out.println("=== JCrush.getFileInfo(String) ===");
+        MediaCrushFile m = JCrush.getFileInfo(TEST_HASH);
         System.out.println("Compression: " + m.getCompression());
         System.out.println("== ORIGINAL FILE ==");
         System.out.println("  - " + m.getOriginalFile().getFile());
@@ -89,8 +89,8 @@ public class APITest {
 
     @Test
     public void multipleFileTest() throws IOException {
-        System.out.println("=== JCrush.getFiles(String...) ===");
-        MediaCrushFile[] files = JCrush.getFiles(TEST_HASH, "tVWMM_ziA3nm");
+        System.out.println("=== JCrush.getFileInfos(String...) ===");
+        MediaCrushFile[] files = JCrush.getFileInfos(TEST_HASH, "tVWMM_ziA3nm");
         for (int i = 0; i < files.length; i++) {
             MediaCrushFile m = files[i];
 

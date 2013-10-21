@@ -12,6 +12,7 @@ import jcrush.model.CrushedFile;
 import jcrush.model.FileStatus;
 import jcrush.model.MediaCrushFile;
 import jcrush.system.Validator;
+import jcrush.system.exceptions.FileUploadFailedException;
 
 import javax.imageio.ImageIO;
 import java.io.*;
@@ -51,7 +52,7 @@ public class JCrush {
      *                    * There was an error invoking {@link jcrush.io.Requester#connect()} <br></br>
      *                    * The json returned contained a 404 error
      */
-    public static MediaCrushFile getFile(String hash) throws IOException {
+    public static MediaCrushFile getFileInfo(String hash) throws IOException {
         Validator.validateNotNull(hash, "hash");
 
         URL uri = new URL(MEDIA_CRUSH_URL + API_DIRECTORY + hash);
@@ -89,7 +90,7 @@ public class JCrush {
      *                    * There was an error invoking {@link jcrush.io.Requester#connect()} <br></br>
      *                    * The json returned contained a 404 error
      */
-    public static MediaCrushFile[] getFiles(String... hash) throws IOException {
+    public static MediaCrushFile[] getFileInfos(String... hash) throws IOException {
         Validator.validateNotNull(hash, "hash");
 
         String list = "";
@@ -127,6 +128,56 @@ public class JCrush {
         }
 
         return array;
+    }
+
+    /**
+     * A convenience method. Returns a {@link MediaCrushFile} object with all info attached and does not throw an exception
+     * when the file does not exist. When the hash specified does not exist, this method simply returns null.
+     * @param hash
+     *            The hash to retrieve
+     * @return
+     *        The file represented as a {@link MediaCrushFile} object.
+     * @throws IOException
+     *                    This exception can be thrown if {@link JCrush#getFileInfo(String)} or {@link JCrush#getFileStatus(String)} throws an exception
+     */
+    public static MediaCrushFile getFile(String hash) throws IOException {
+        if (!doesExists(hash))
+            return null;
+
+        MediaCrushFile file = getFileInfo(hash);
+        FileStatus status = getFileStatus(hash).getStatus();
+
+        try {
+            setStatus(file, status);
+        } catch (NoSuchFieldException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
+
+        return file;
+    }
+
+    /**
+     * A convenience method. Returns a {@link MediaCrushFile} object with all info attached and does not throw an exception
+     * when the file does not exist. When the hash specified does not exist, this method simply returns null. <br></br>
+     * If any file throws an {@link IOException}, then the exception is ignored and the file in the array is set to null.
+     * @param hash
+     *            The hash(s) to retrieve
+     * @return
+     *        The file(s) represented as an array of {@link MediaCrushFile} object(s).
+     */
+    public static MediaCrushFile[] getFiles(String... hash) {
+        MediaCrushFile[] files = new MediaCrushFile[hash.length];
+        for (int i = 0; i < files.length; i++) {
+            try {
+                files[i] = getFile(hash[i]);
+            } catch (IOException e) {
+                files[i] = null;
+            }
+        }
+
+        return files;
     }
 
     public static boolean doesExists(String hash) throws IOException {
@@ -212,13 +263,13 @@ public class JCrush {
             int code = requester.getResponseCode();
             switch (code) {
                 case 409:
-                    throw new IOException("This file was already uploaded!");
+                    throw new FileUploadFailedException("This file was already uploaded!", e);
                 case 420:
-                    throw new IOException("The rate limit was exceeded. Enhance your calm.");
+                    throw new FileUploadFailedException("The rate limit was exceeded. Enhance your calm.", e);
                 case 415:
-                    throw new IOException("The file extension is not acceptable.");
+                    throw new FileUploadFailedException("The file extension is not acceptable.", e);
                 default:
-                    throw new IOException("The server responded with an unknown error code! (" + code + ")");
+                    throw new IOException("The server responded with an unknown error code! (" + code + ")", e);
             }
         }
 
@@ -239,11 +290,11 @@ public class JCrush {
             }
             switch (code) {
                 case 409:
-                    throw new IOException("This file was already uploaded!");
+                    throw new FileUploadFailedException("This file was already uploaded!");
                 case 420:
-                    throw new IOException("The rate limit was exceeded. Enhance your calm.");
+                    throw new FileUploadFailedException("The rate limit was exceeded. Enhance your calm.");
                 case 415:
-                    throw new IOException("The file extension is not acceptable.");
+                    throw new FileUploadFailedException("The file extension is not acceptable.");
                 default:
                     throw new IOException("The server responded with an unknown error code! (" + code + ")");
             }

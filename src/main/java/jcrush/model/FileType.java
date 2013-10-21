@@ -5,6 +5,11 @@ public enum FileType {
     MP4("video/mp4"),
     OGV("video/ogg"),
     GIF("image/gif"),
+    PNG("image/png"),
+    JPEG("image/jpg"),
+    JPG("image/jpg"),
+    MP3("audio/mp3"),
+    OGG("audio/ogg"),
     WEBM("video/webm");
 
     String type;
