@@ -13,7 +13,7 @@ So just run 'mvn clean install' in the project's root directory.
 
 ##Usage and Examples
 ###File Retrieving
-Exposes https://github.com/MediaCrush/MediaCrush/blob/master/docs/api.md#apihash
+**Exposes** https://github.com/MediaCrush/MediaCrush/blob/master/docs/api.md#apihash
 ```java
   try {
       MediaCrushFile file = JCrush.getFileInfo("CPvuR5lRhmS0");
@@ -42,10 +42,10 @@ You can also add unlimited parameters using the getFileInfos method
   }
 ```
 
-See Also: [JCrush.getFile][3], [JCrush.getFiles][4]
+**See Also:** [JCrush.getFile][3], [JCrush.getFiles][4]
 
 ###File Status
-Exposes https://github.com/MediaCrush/MediaCrush/blob/master/docs/api.md#apihashstatus
+**Exposes** https://github.com/MediaCrush/MediaCrush/blob/master/docs/api.md#apihashstatus
 ```java
   try {
       MediaCrushFile file = JCrush.getFileStatus("CPvuR5lRhmS0");
@@ -56,10 +56,10 @@ Exposes https://github.com/MediaCrush/MediaCrush/blob/master/docs/api.md#apihash
   FileStatus = file.getStatus(); //Returns a jcrush.model.FileStatus enum
 ```
 
-See Also: [JCrush.getFile][3], [JCrush.getFiles][4]
+**See Also:** [JCrush.getFile][3], [JCrush.getFiles][4]
 
 ###Checking if a file exists
-Exposes https://github.com/MediaCrush/MediaCrush/blob/master/docs/api.md#apihashexists
+**Exposes** https://github.com/MediaCrush/MediaCrush/blob/master/docs/api.md#apihashexists
 ```java
   try {
       boolean result = JCrush.doesExist("CPvuR5lRhmS0");
@@ -72,11 +72,22 @@ Exposes https://github.com/MediaCrush/MediaCrush/blob/master/docs/api.md#apihash
   }
 ```
 
+**See Also:** [JCrush.getFile][3], [JCrush.getFiles][4]
+
 ###File Uploading via files
-Exposes https://github.com/MediaCrush/MediaCrush/blob/master/docs/api.md#apiuploadfile
+**Exposes** https://github.com/MediaCrush/MediaCrush/blob/master/docs/api.md#apiuploadfile
 ```java
   File f = new File("myFile.gif");
-  String newHash = JCrush.uploadFile(f);
+  try {
+      String newHash = JCrush.uploadFile(f);
+  } catch (IOException e) {
+      //File uploading failed..
+	  return;
+  } catch (FileUploadFailedException e) {
+      //File failed to upload
+      //This exception is only thrown for one of the reasons specified in the API documentation
+      return;
+  }
   
   //OR
   try {
@@ -86,19 +97,19 @@ Exposes https://github.com/MediaCrush/MediaCrush/blob/master/docs/api.md#apiuplo
 	  return;
   } catch (FileUploadFailedException e) {
       //File failed to upload
-	  //This exception is only thrown for one of the reasons specified in the API documentation
-	  return;
+      //This exception is only thrown for one of the reasons specified in the API documentation
+      return;
   }
 ```
 
 ###File Uploading via URL
-Exposes https://github.com/MediaCrush/MediaCrush/blob/master/docs/api.md#apiuploadurl
+**Exposes** https://github.com/MediaCrush/MediaCrush/blob/master/docs/api.md#apiuploadurl
 ```java
   //Coming soon
 ```
 
 ###File Deleting
-Exposes https://github.com/MediaCrush/MediaCrush/blob/master/docs/api.md#apihashdelete
+**Exposes** https://github.com/MediaCrush/MediaCrush/blob/master/docs/api.md#apihashdelete
 ```java
   try {
       JCrush.delete("CPvuR5lRhmS0");
@@ -109,10 +120,11 @@ Exposes https://github.com/MediaCrush/MediaCrush/blob/master/docs/api.md#apihash
 ```
 
 ###getFile (convenience method)
-Exposes:
-    https://github.com/MediaCrush/MediaCrush/blob/master/docs/api.md#apihash
-    https://github.com/MediaCrush/MediaCrush/blob/master/docs/api.md#apihashstatus
-    https://github.com/MediaCrush/MediaCrush/blob/master/docs/api.md#apihashexists
+**Exposes:**
+
+https://github.com/MediaCrush/MediaCrush/blob/master/docs/api.md#apihash
+https://github.com/MediaCrush/MediaCrush/blob/master/docs/api.md#apihashstatus
+https://github.com/MediaCrush/MediaCrush/blob/master/docs/api.md#apihashexists
 ```java
   try {
       MediaCrushFile file = JCrush.getFile("CPvuR5lRhmS0");
@@ -132,20 +144,36 @@ Exposes:
   FileStatus = file.getStatus(); //Returns a jcrush.model.FileStatus enum
 ```
 
-You can also add unlimited parameters using the getFileInfos method
+**Notes:** This is a convenience method. It returns a MediaCrushFile object with all info attached and does not throw an exception 
+when the file does not exist. When the hash specified does not exist, this method simply returns null. However, an exception
+may be thrown if the server responds in an abnormal way.
+
+###getFiles (convenience method)
+**Exposes:**
+
+https://github.com/MediaCrush/MediaCrush/blob/master/docs/api.md#apihash
+https://github.com/MediaCrush/MediaCrush/blob/master/docs/api.md#apihashstatus
+https://github.com/MediaCrush/MediaCrush/blob/master/docs/api.md#apihashexists
 ```java
-  try {
-      MediaCrushFile[] files = JCrush.getFiles("CPvuR5lRhmS0", "tVWMM_ziA3nm", ...);
-  } catch (IOException e) {
-      //File retrieval failed..
-	  return;
-  }
+  MediaCrushFile[] files = JCrush.getFiles("CPvuR5lRhmS0", "tVWMM_ziA3nm", ...);
 ```
 
-Notes: These are a convenience method. They return a MediaCrushFile object with all info attached and does not throw an exception 
-when the file does not exist. When the hash specified does not exist, this method simply returns null.
-However, in getFile, an exception can be thrown if the server responded in an abnormal way. BUT, getFiles never throws an exception, it simply sets the file to null.
+**Notes:** This is a convenience method. It returns an array of MediaCrushFile objects with all info attached and does not throw an exception 
+when the file does not exist. It allows infinate amount of parameters, and also allows a String array to be passed. 
+When one of the hash's specified does not exist, it's value in the array is just set to null. Unlike the getFile method, this method never
+throws an exception, if an exception was thrown, then it's value in the array is set to null.
+
+##License
+This project is Open Source under the MIT Open Source License.
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
 [1]: https://github.com/MediaCrush/MediaCrush
 [2]: https://mediacru.sh/docs/API
+[3]: https://github.com/hypereddie10/jCrush#getfile-convenience-method
+[4]: https://github.com/hypereddie10/jCrush#getfiles-convenience-method
