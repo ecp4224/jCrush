@@ -8,3 +8,6 @@
 # IntelliJ Files #
 *.iml
 .idea/*
+
+*.db
+target/*
