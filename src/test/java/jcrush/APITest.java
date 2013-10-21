@@ -14,7 +14,7 @@ public class APITest {
     public void failedUploadFileTest() throws IOException {
         System.out.println("=== JCrush.uploadFile(File) ===");
 
-        File testFile = new File("failedTest.gif");
+        File testFile = new File("src/test/failedTest.gif");
         JCrush.uploadFile(testFile);
         System.out.println("TEST COMPLETE");
     }
@@ -24,7 +24,7 @@ public class APITest {
         System.out.println("=== JCrush.uploadFile(File) ===");
         System.out.println("=== JCrush.delete(String) ===");
 
-        File testFile = new File("test.gif");
+        File testFile = new File("src/test/test.gif");
         String hash = JCrush.uploadFile(testFile);
         JCrush.delete(hash);
         System.out.println("TEST COMPLETE");
