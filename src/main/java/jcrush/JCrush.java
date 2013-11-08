@@ -20,6 +20,8 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Type;
+import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -455,6 +457,124 @@ public class JCrush {
             throw new IOException("Error creating MediaCrushFile", e);
         } catch (InvocationTargetException e) {
             throw new IOException("Error creating MediaCrushFile", e);
+        }
+    }
+    /**
+     * Upload the file at a URL to mediacru.sh <br></br>
+     * {@link JCrush#uploadFileViaURL(String)} is invoked with {@link java.net.URL#toString()} passed as the URL parameter
+     * @param url
+     *          The URL from where to fetch the file to upload, represented as a {@link URL} object
+     * @return
+     *        The hash of the currently uploading file on mediacru.sh
+     * @throws IOException
+     *                    An IOException will only be thrown if {@link JCrush#uploadFileViaURL(String)} throws an exception
+     * @see JCrush#uploadFileViaURL(String)
+     */
+    public static String uploadFileViaURL(URL url) throws IOException {
+        Validator.validateNotNull(url, "url");
+        return uploadFileViaURL(url.toString());
+    }
+
+    /**
+     * Upload the file at a URL to mediacru.sh <br></br>
+     * {@link JCrush#uploadFileViaURL(String)} is invoked with {@link java.net.URI#toString()} passed as the URL parameter
+     * @param uri
+     *          The URL from where to fetch the file to upload, represented as a {@link URI} object
+     * @return
+     *        The hash of the currently uploading file on mediacru.sh
+     * @throws IOException
+     *                    An IOException will only be thrown if {@link JCrush#uploadFileViaURL(String)} throws an exception
+     * @see JCrush#uploadFileViaURL(String)
+     */
+    public static String uploadFileViaURL(URI uri) throws IOException {
+        Validator.validateNotNull(uri, "uri");
+        return uploadFileViaURL(uri.toString());
+    }
+
+    /**
+     * Upload the file at a URL to mediacru.sh <br></br>
+     * @param url
+     *            The URL from where to fetch the file to upload
+     * @return
+     *        The hash of the currently uploading file on mediacru.sh
+     * @throws FileUploadFailedException
+     *                                  A FileUploadFiledException can be thrown for the following reasons: <br></br>
+     *                                  * The file was already uploaded. <br></br>
+     *                                  * The rate limit was exceeded. <br></br>
+     *                                  * The file extension is not acceptable. <br></br>
+     *                                  * The URL was invalid <br></br>
+     *                                  * The file requested does not exist <br></br>
+     * @throws IOException
+     *                    An IOException can be thrown for the following reasons:<br></br>
+     *                    * An unknown error code was returned from the server <br></br>
+     */
+    public static String uploadFileViaURL(String url) throws IOException {
+        Validator.validateNotNull(url, "url");
+
+        String post = "url=" + url;
+        URL uri = new URL(MEDIA_CRUSH_URL + API_DIRECTORY + "upload/url");
+        Requester requester = new Requester(ConnectionType.POST, uri);
+        requester.setPostData(post);
+        requester.addHeader("Content-Length", "" + post.length());
+        requester.setRecieve(true);
+        try {
+            requester.connect(); //Connect
+        } catch (IOException e) {
+            BufferedReader read = new BufferedReader(new InputStreamReader(
+                    requester.getErrorStream()));
+            StringBuilder builder = new StringBuilder(100);
+            String line;
+            while ((line = read.readLine()) != null)
+                builder.append(line);
+            read.close();
+            String reason = builder.toString();
+
+            int code = requester.getResponseCode();
+            switch (code) {
+                case 400:
+                    throw new FileUploadFailedException("The URL is invalid.", e);
+                case 404:
+                    throw new FileUploadFailedException("The file requested does not exist", e);
+                case 409:
+                    throw new FileUploadFailedException("This file was already uploaded!", e);
+                case 420:
+                    throw new FileUploadFailedException("The rate limit was exceeded. Enhance your calm.", e);
+                case 415:
+                    throw new FileUploadFailedException("The file extension is not acceptable.", e);
+                default:
+                    throw new IOException("The server responded with an unknown error code! (" + code + ")", e);
+            }
+        }
+
+        //Parse results
+        int code = requester.getResponseCode();
+        String json = requester.getResponse();
+        requester.disconnect(); //Disconnect
+        Map map = GSON.fromJson(json, Map.class);
+        if (code == 200 && !map.containsKey("error")) {
+            return (String)map.get("hash");
+        } else {
+            if (code == 200) {
+                try {
+                    code = Integer.parseInt((String)map.get("error"));
+                } catch (Throwable t) {
+                    throw new IOException("The server responded with an unknown error (" + (map.get("error") == null ? "null" : map.get("error")) + ")", t);
+                }
+            }
+            switch (code) {
+                case 400:
+                    throw new FileUploadFailedException("The URL is invalid.");
+                case 404:
+                    throw new FileUploadFailedException("The file requested does not exist");
+                case 409:
+                    throw new FileUploadFailedException("This file was already uploaded!");
+                case 420:
+                    throw new FileUploadFailedException("The rate limit was exceeded. Enhance your calm.");
+                case 415:
+                    throw new FileUploadFailedException("The file extension is not acceptable.");
+                default:
+                    throw new IOException("The server responded with an unknown error code! (" + code + ")");
+            }
         }
     }
 }
