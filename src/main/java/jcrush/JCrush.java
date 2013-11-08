@@ -5,7 +5,6 @@ import static jcrush.system.Utils.*;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import com.sun.xml.internal.ws.util.ByteArrayBuffer;
 import jcrush.io.ConnectionType;
 import jcrush.io.Requester;
 import jcrush.model.CrushedFile;
