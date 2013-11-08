@@ -105,7 +105,29 @@ You can also add unlimited parameters using the getFileInfos method
 ###File Uploading via URL
 **Exposes** https://github.com/MediaCrush/MediaCrush/blob/master/docs/api.md#apiuploadurl
 ```java
-  //Coming soon
+  try {
+      String newHash = JCrush.uploadFileViaURL("http://www.example.com/myimage.gif");
+  } catch (IOException e) {
+      //File uploading failed..
+	  return;
+  } catch (FileUploadFailedException e) {
+      //File failed to upload
+      //This exception is only thrown for one of the reasons specified in the API documentation
+      return;
+  }
+  
+  //OR
+  try {
+      URL url = new URL("http://www.example.com/myimage.gif");
+      String newHash = JCrush.uploadFileViaURL(url);
+  } catch (IOException e) {
+      //File uploading failed..
+	  return;
+  } catch (FileUploadFailedException e) {
+      //File failed to upload
+      //This exception is only thrown for one of the reasons specified in the API documentation
+      return;
+  }
 ```
 
 ###File Deleting
