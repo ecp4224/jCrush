@@ -51,6 +51,7 @@ public class JCrush {
      *                    An {@link IOException} can be thrown for the following reasons: <br></br>
      *                    * There was an error invoking {@link jcrush.io.Requester#connect()} <br></br>
      *                    * The json returned contained a 404 error
+     * @see jcrush.io.Requester#connect()
      */
     public static MediaCrushFile getFileInfo(String hash) throws IOException {
         Validator.validateNotNull(hash, "hash");
@@ -89,6 +90,7 @@ public class JCrush {
      *                    An {@link IOException} can be thrown for the following reasons: <br></br>
      *                    * There was an error invoking {@link jcrush.io.Requester#connect()} <br></br>
      *                    * The json returned contained a 404 error
+     * @see jcrush.io.Requester#connect()
      */
     public static MediaCrushFile[] getFileInfos(String... hash) throws IOException {
         Validator.validateNotNull(hash, "hash");
@@ -139,6 +141,8 @@ public class JCrush {
      *        The file represented as a {@link MediaCrushFile} object.
      * @throws IOException
      *                    This exception can be thrown if {@link JCrush#getFileInfo(String)} or {@link JCrush#getFileStatus(String)} throws an exception
+     * @see JCrush#getFileInfo(String)
+     * @see JCrush#getFileStatus(String)
      */
     public static MediaCrushFile getFile(String hash) throws IOException {
         if (!doesExists(hash))
@@ -180,6 +184,16 @@ public class JCrush {
         return files;
     }
 
+    /**
+     * Returns whether a hash exists or not.
+     * @param hash
+     *            The hash to lookup
+     * @return
+     *        true if the has exists or false if it does not
+     * @throws IOException
+     *                    An {@link IOException} will be thrown if {@link jcrush.io.Requester#connect()} raises an exception
+     * @see jcrush.io.Requester#connect()
+     */
     public static boolean doesExists(String hash) throws IOException {
         Validator.validateNotNull(hash, "hash");
 
@@ -196,6 +210,18 @@ public class JCrush {
         return true;
     }
 
+    /**
+     * Upload a file to mediacru.sh <br></br>
+     * This method creates a new instance of a {@link File} and then invoke {@link JCrush#uploadFile(java.io.File)}
+     * @param filePath
+     *                The full file path to the file that will be uploaded to mediacru.sh
+     * @throws IOException
+     *                    An IOException can be thrown for the following reasons:<br></br>
+     *                    * The file path specified is not a file, but a directory   <br></br>
+     *                    * The file path specified does not exist  <br></br>
+     *                    * {@link JCrush#uploadFile(java.io.File)} raises an Exception  <br></br>
+     * @see JCrush#uploadFile(java.io.File)
+     */
     public static void uploadFile(String filePath) throws IOException {
         Validator.validateNotNull(filePath, "filePath");
         File file = new File(filePath);
@@ -207,6 +233,36 @@ public class JCrush {
             uploadFile(file);
     }
 
+    /**
+     * Upload the file specified in the parameter to mediacru.sh <br></br>
+     * Only the following file types are allowed:<br></br>
+     * * .png <br></br>
+     * * .jpg <br></br>
+     * * .jpeg <br></br>
+     * * .gif <br></br>
+     * * .mp4 <br></br>
+     * * .ogv <br></br>
+     * * .mp3 <br></br>
+     * * .ogg <br></br>
+     * An unknown file type will raise an {@link IOException} <br></br>
+     *
+     * @param file
+     *            The file to upload represented as a {@link File} object
+     * @return
+     *        The hash of the currently uploading file on mediacru.sh
+     * @throws FileUploadFailedException
+     *                                  A FileUploadFiledException can be thrown for the following reasons: <br></br>
+     *                                  * The file was already uploaded. <br></br>
+     *                                  * The rate limit was exceeded. <br></br>
+     *                                  * The file extension is not acceptable. However, for this to be thrown is highly unlikely. An {@link IOException} will be thrown first
+     *                                  before the upload with the reason "Unknown file type!"
+     * @throws IOException
+     *                    An IOException can be thrown for the following reasons:<br></br>
+     *                    * An unknown file type was specified <br></br>
+     *                    * The file specified does not exist <br></br>
+     *                    * The file specified is not a file, but a directory <br></br>
+     *                    * An unknown error code was returned from the server <br></br>
+     */
     public static String uploadFile(File file) throws IOException {
         Validator.validateNotNull(file, "file");
 
@@ -301,6 +357,18 @@ public class JCrush {
         }
     }
 
+    /**
+     * Delete a file from mediacru.sh. <br></br>
+     * Only same IP as the uploader may delete the file specified. An {@link IOException} will be thrown if the IP's do
+     * not match
+     * @param hash
+     *            The hash of the file to delete
+     * @throws IOException
+     *                    An IOException can be thrown for the following reasons: <br></br>
+     *                    * The hash specified does not exist  <br></br>
+     *                    * The IP does not match the stored hash <br></br>
+     *                    * The server responded with an unknown error code. <br></br>
+     */
     public static void delete(String hash) throws IOException {
         Validator.validateNotNull(hash, "hash");
 
@@ -327,11 +395,34 @@ public class JCrush {
         }
     }
 
+    /**
+     * Delete the {@link MediaCrushFile} object from mediacru.sh <br></br>
+     * Only same IP as the uploader may delete the file specified. An {@link IOException} will be thrown if the IP's do
+     * not match
+     * @param file
+     *            The {@link MediaCrushFile} object that represents the file to delete
+     * @throws IOException
+     *                    An IOException will only be thrown if {@link JCrush#delete(String)} throws an exception
+     * @see JCrush#delete(String)
+     */
     public static void delete(MediaCrushFile file) throws IOException {
         Validator.validateNotNull(file, "file");
         delete(file.getHash());
     }
 
+    /**
+     * Get the current upload status for the file specified by the hash
+     * @param hash
+     *            The hash of the file
+     * @return
+     *        A {@link MediaCrushFile} object that represents the file. <br></br>
+     *        You can use {@link jcrush.model.MediaCrushFile#getStatus()} to get the status of the file
+     * @throws IOException
+     *                   An IOException can be thrown for the following reasons: <br></br>
+     *                   * {@link jcrush.io.Requester#connect()} throws an IOException
+     *                   * There was an error constructing the {@link MediaCrushFile} file.
+     * @see jcrush.io.Requester#connect()
+     */
     public static MediaCrushFile getFileStatus(String hash) throws IOException {
         Validator.validateNotNull(hash, "hash");
 
