@@ -2,13 +2,16 @@ package jcrush;
 
 import jcrush.model.MediaCrushFile;
 import java.io.File;
+
+import jcrush.system.exceptions.FileUploadFailedException;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.net.URI;
+import java.net.URL;
 
 public class APITest {
     private static final String TEST_HASH = "CPvuR5lRhmS0";
-
 
     @Test(expected = IOException.class)
     public void failedUploadFileTest() throws IOException {
@@ -19,7 +22,7 @@ public class APITest {
         System.out.println("TEST COMPLETE");
     }
 
-    @Test
+    @Test(expected = FileUploadFailedException.class)
     public void uploadAndDeleteFile() throws IOException {
         System.out.println("=== JCrush.uploadFile(File) ===");
         System.out.println("=== JCrush.delete(String) ===");
@@ -27,6 +30,20 @@ public class APITest {
         File testFile = new File("src/test/test.gif");
         String hash = JCrush.uploadFile(testFile);
         JCrush.delete(hash);
+        System.out.println("TEST COMPLETE");
+    }
+    @Test
+    public void uploadViaURL() throws IOException {
+        System.out.println("=== JCrush.uploadFileViaURL(URL) ===");
+        System.out.println("=== JCrush.uploadFileViaURL(String) ===");
+        URL url1 = new URL("http://rmart.org/45341/Src/1ac65c7f45047fb99d58d3c87052fcc1.gif");
+        String url2 = "http://25.media.tumblr.com/tumblr_mec3lqCnpg1qce7tgo1_500.gif";
+
+        String hash2 = JCrush.uploadFileViaURL(url1);
+        String hash = JCrush.uploadFileViaURL(url2);
+
+        System.out.println(hash);
+        System.out.println(hash2);
         System.out.println("TEST COMPLETE");
     }
 
