@@ -1,4 +1,4 @@
-#jCrush
+#jCrush [![Build Status](https://drone.io/github.com/hypereddie10/jCrush/status.png)](https://drone.io/github.com/hypereddie10/jCrush/latest)
 A java library for [mediacru.sh][1]
 
 
