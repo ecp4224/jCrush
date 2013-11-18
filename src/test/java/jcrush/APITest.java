@@ -21,8 +21,8 @@ public class APITest {
         JCrush.uploadFile(testFile);
         System.out.println("TEST COMPLETE");
     }
-
-    @Test(expected = FileUploadFailedException.class)
+    
+    //Removing test until issue #354 in MediaCrush is fixed
     public void uploadAndDeleteFile() throws IOException {
         System.out.println("=== JCrush.uploadFile(File) ===");
         System.out.println("=== JCrush.delete(String) ===");
@@ -32,7 +32,7 @@ public class APITest {
         JCrush.delete(hash);
         System.out.println("TEST COMPLETE");
     }
-    @Test
+    //Removing test until issue #354 in MediaCrush is fixed
     public void uploadViaURL() throws IOException {
         System.out.println("=== JCrush.uploadFileViaURL(URL) ===");
         System.out.println("=== JCrush.uploadFileViaURL(String) ===");
