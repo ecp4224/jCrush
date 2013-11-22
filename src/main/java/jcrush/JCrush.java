@@ -28,8 +28,8 @@ public class JCrush {
 	
     private static final Gson GSON;
 
-	private static final String DEFAULT_SERVER_API_URL = MEDIA_CRUSH_URL + API_DIRECTORY;
-	private static String serverApiUrl = DEFAULT_SERVER_API_URL;
+    private static final String DEFAULT_SERVER_API_URL = MEDIA_CRUSH_URL + API_DIRECTORY;
+    private static String serverApiUrl = DEFAULT_SERVER_API_URL;
 
     static {
         GSON = new Gson();
@@ -42,9 +42,10 @@ public class JCrush {
      */
     public static void init(String serverApiUrl) {
     	JCrush.serverApiUrl = serverApiUrl;
+    	_setSystemProperties();
     }
     
-    public static void _setSystemProperties() {
+    private static void _setSystemProperties() {
         System.setProperty("http.agent", DEFAULT_USER_AGENT);
     }
 
