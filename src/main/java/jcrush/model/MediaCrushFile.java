@@ -35,4 +35,35 @@ public class MediaCrushFile {
     public FileStatus getStatus() {
         return status == null ? FileStatus.DONE : status;
     }
+
+    @Override
+    public int hashCode() {
+        return hash.hashCode();
+    }
+
+    @Override
+    public String toString() {
+        String files = "";
+        for (CrushedFile f : getFiles()) {
+            files += "=====" + f.getFile() + "====\n";
+            files += f.toString();
+            files += "==============================";
+        }
+        return "Hash: " + hash + "\n" +
+                "Compression: " + compression + "\n" +
+                "File Status: " + getStatus() + "\n" +
+                "== Original File ==\n" +
+                getOriginalFile().toString() + "\n" +
+                "==============================\n" +
+                files;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof MediaCrushFile) {
+            MediaCrushFile mediaCrushFile = (MediaCrushFile)obj;
+            return mediaCrushFile.hash.equals(hash);
+        }
+        return false;
+    }
 }

@@ -1,19 +1,20 @@
 package jcrush.model;
 
 public enum FileType {
-    UNKNOWN("???"),
-    MP4("video/mp4"),
-    OGV("video/ogg"),
-    GIF("image/gif"),
-    PNG("image/png"),
-    JPEG("image/jpg"),
-    JPG("image/jpg"),
-    MP3("audio/mp3"),
-    OGG("audio/ogg"),
-    WEBM("video/webm");
+    UNKNOWN("???", ".dat"),
+    MP4("video/mp4", "mp4"),
+    OGV("video/ogv", "ogv"),
+    GIF("image/gif", "gif"),
+    PNG("image/png", "png"),
+    JPEG("image/jpg", "jpeg"),
+    JPG("image/jpg", "jpg"),
+    MP3("audio/mp3", "mp3"),
+    OGG("audio/ogg", "ogg"),
+    WEBM("video/webm", "");
 
     String type;
-    FileType(String type) { this.type = type; }
+    String ext;
+    FileType(String type, String ext) { this.type = type; this.ext = ext; }
 
     public static FileType toFileType(String type) {
         for (FileType t : values()) {
@@ -23,7 +24,11 @@ public enum FileType {
         return UNKNOWN;
     }
 
+    public String getFileExtension() {
+        return ext;
+    }
+
     public String toString() {
-        return name() + " (" + type + ")";
+        return type;
     }
 }

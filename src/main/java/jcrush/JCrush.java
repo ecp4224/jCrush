@@ -1,31 +1,25 @@
 package jcrush;
 
-import static jcrush.system.Constants.*;
-import static jcrush.system.Utils.*;
-
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import com.sun.xml.internal.ws.util.ByteArrayBuffer;
 import jcrush.io.ConnectionType;
 import jcrush.io.Requester;
-import jcrush.model.CrushedFile;
 import jcrush.model.FileStatus;
+import jcrush.model.FileType;
 import jcrush.model.MediaCrushFile;
 import jcrush.system.Validator;
 import jcrush.system.exceptions.FileUploadFailedException;
 
-import javax.imageio.ImageIO;
 import java.io.*;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Type;
-import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+
+import static jcrush.system.Constants.*;
+import static jcrush.system.Utils.*;
 
 /**
  * Static methods that expose the MediaCrush API
@@ -274,19 +268,60 @@ public class JCrush {
             throw new IOException("This file is a directory!");
 
         //Get content type of file
-        String contentType = toContentType(file);
+        FileType contentType = FileType.toFileType(toContentType(file));
         if (contentType == null)
             throw new IOException("Unknown file type!");
 
+        return uploadFile(new FileInputStream(file), contentType, file.getName());
+    }
+
+    /**
+     * Upload an image/sound/video to mediacru.sh using the data provided in the InputStream provided <br></br>
+     * This method requires a file name with an extension at the end. This can be provided manually or you can use the
+     * helper method {@link jcrush.model.FileType#getFileExtension()} <br></br>
+     * Only the following file types are allowed:<br></br>
+     * * .png <br></br>
+     * * .jpg <br></br>
+     * * .jpeg <br></br>
+     * * .gif <br></br>
+     * * .mp4 <br></br>
+     * * .ogv <br></br>
+     * * .mp3 <br></br>
+     * * .ogg <br></br>
+     * An unknown file type will raise an {@link IOException} <br></br>
+     *
+     * @param imageData
+     *                 The {@link InputStream} with the image data to upload
+     * @param type
+     *            The {@link FileType} of the data being uploaded
+     * @param fileName
+     *                 The file name for this data <b>INCLUDING</b> the file extension.
+     * @return
+     *        The hash of the currently uploading file on mediacru.sh
+     * @throws FileUploadFailedException
+     *                                  A FileUploadFiledException can be thrown for the following reasons: <br></br>
+     *                                  * The file was already uploaded. <br></br>
+     *                                  * The rate limit was exceeded. <br></br>
+     *                                  * The file extension is not acceptable. However, for this to be thrown is highly unlikely. An {@link IOException} will be thrown first
+     *                                  before the upload with the reason "Unknown file type!"
+     * @throws IOException
+     *                    An IOException can be thrown for the following reasons:<br></br>
+     *                    * An unknown file type was specified <br></br>
+     *                    * The file specified does not exist <br></br>
+     *                    * The file specified is not a file, but a directory <br></br>
+     *                    * An unknown error code was returned from the server <br></br>
+     */
+    public static String uploadFile(InputStream imageData, FileType type, String fileName) throws IOException {
+
         //Read file into byte array
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        copy(new FileInputStream(file), baos, 1024);
+        copy(imageData, baos, 1024);
         byte[] bytes = baos.toByteArray();
 
         //Prepare form data to send
         String header = "\r\n--" + CONTENT_DIVIDER + "\r\n" +
-                "Content-Disposition: form-data; name=\"file\"; filename=\"" + file.getName() + "\"" + "\r\n" +
-                "Content-Type: " + contentType + "\r\n" +
+                "Content-Disposition: form-data; name=\"file\"; filename=\"" + fileName + "\"" + "\r\n" +
+                "Content-Type: " + type.toString() + "\r\n" +
                 "Content-Transfer-Encoding: binary\r\n" +
                 "\r\n";
         ByteArrayOutputStream bos = new ByteArrayOutputStream();

@@ -27,12 +27,13 @@ public class APITest {
         System.out.println("=== JCrush.uploadFile(File) ===");
         System.out.println("=== JCrush.delete(String) ===");
 
-        File testFile = new File("src/test/test.gif");
+        File testFile = new File("src/test/test2.gif");
+        JCrush.delete("bTVxrDGQ4ks_");
         String hash = JCrush.uploadFile(testFile);
-        JCrush.delete(hash);
+        System.out.println(hash);
         System.out.println("TEST COMPLETE");
     }
-    @Test
+    @Test (expected = FileUploadFailedException.class)
     public void uploadViaURL() throws IOException {
         System.out.println("=== JCrush.uploadFileViaURL(URL) ===");
         System.out.println("=== JCrush.uploadFileViaURL(String) ===");

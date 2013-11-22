@@ -29,4 +29,8 @@ public enum FileStatus {
 
         return ERROR;
     }
+
+    public String toString() {
+        return type;
+    }
 }

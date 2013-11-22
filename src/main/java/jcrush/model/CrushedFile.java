@@ -22,4 +22,19 @@ public class CrushedFile {
             fileType = FileType.toFileType(type);
         return fileType;
     }
+
+    @Override
+    public String toString() {
+        return "File: " + file + "\n" +
+                "Type: " + type + "\n";
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof CrushedFile) {
+            CrushedFile file = (CrushedFile)obj;
+            return file.file.equals(this.file) && file.fileType.equals(fileType);
+        }
+        return false;
+    }
 }
