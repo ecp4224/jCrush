@@ -1,14 +1,12 @@
 package jcrush;
 
-import jcrush.model.MediaCrushFile;
 import java.io.File;
-
-import jcrush.system.exceptions.FileUploadFailedException;
-import org.junit.Test;
-
 import java.io.IOException;
-import java.net.URI;
 import java.net.URL;
+
+import jcrush.model.MediaCrushFile;
+
+import org.junit.Test;
 
 public class APITest {
     private static final String TEST_HASH = "CPvuR5lRhmS0";
