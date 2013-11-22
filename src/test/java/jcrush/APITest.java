@@ -27,7 +27,7 @@ public class APITest {
         System.out.println("=== JCrush.uploadFile(File) ===");
         System.out.println("=== JCrush.delete(String) ===");
 
-        File testFile = new File("src/test/test2.gif");
+        File testFile = new File("src/test/test.gif");
         JCrush.delete("bTVxrDGQ4ks_");
         String hash = JCrush.uploadFile(testFile);
         System.out.println(hash);
