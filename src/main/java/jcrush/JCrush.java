@@ -25,13 +25,26 @@ import static jcrush.system.Utils.*;
  * Static methods that expose the MediaCrush API
  */
 public class JCrush {
+	
     private static final Gson GSON;
+
+	private static final String DEFAULT_SERVER_API_URL = MEDIA_CRUSH_URL + API_DIRECTORY;
+	private static String serverApiUrl = DEFAULT_SERVER_API_URL;
 
     static {
         GSON = new Gson();
     }
 
-    public static void setSystemProperties() {
+    /**
+     * Initialize JCrush and configure the server URL where API resides. By default,
+     * it uses https://www.mediacru.sh/api
+     * @param serverApiUrl The URL where API waits for connections.
+     */
+    public static void init(String serverApiUrl) {
+    	JCrush.serverApiUrl = serverApiUrl;
+    }
+    
+    public static void _setSystemProperties() {
         System.setProperty("http.agent", DEFAULT_USER_AGENT);
     }
 
@@ -52,7 +65,7 @@ public class JCrush {
     public static MediaCrushFile getFileInfo(String hash) throws IOException {
         Validator.validateNotNull(hash, "hash");
 
-        URL uri = new URL(MEDIA_CRUSH_URL + API_DIRECTORY + hash);
+        URL uri = new URL(serverApiUrl + hash);
         Requester requester = new Requester(ConnectionType.GET, uri);
         requester.setRecieve(true);
         requester.connect();
@@ -99,7 +112,7 @@ public class JCrush {
                 list += "," + hash[i];
         }
 
-        URL uri = new URL(MEDIA_CRUSH_URL + API_DIRECTORY + "info?list=" + list);
+        URL uri = new URL(serverApiUrl + "info?list=" + list);
         Requester requester = new Requester(ConnectionType.GET, uri);
         requester.setRecieve(true);
         requester.connect();
@@ -193,7 +206,7 @@ public class JCrush {
     public static boolean doesExists(String hash) throws IOException {
         Validator.validateNotNull(hash, "hash");
 
-        URL uri = new URL(MEDIA_CRUSH_URL + API_DIRECTORY + hash + "/exists");
+        URL uri = new URL(serverApiUrl + hash + "/exists");
         Requester requester = new Requester(ConnectionType.HEAD, uri);
         requester.setRecieve(true);
         try {
@@ -332,7 +345,7 @@ public class JCrush {
         byte[] tosend = bos.toByteArray();
 
         //Prepare the requester with form data
-        URL uri = new URL(MEDIA_CRUSH_URL + API_DIRECTORY + "upload/file");
+        URL uri = new URL(serverApiUrl + "upload/file");
         Requester requester = new Requester(ConnectionType.POST, uri);
         requester.setPostData(tosend);
         requester.addHeader("Content-Length", "" + tosend.length);
@@ -409,7 +422,7 @@ public class JCrush {
     public static void delete(String hash) throws IOException {
         Validator.validateNotNull(hash, "hash");
 
-        URL uri = new URL(MEDIA_CRUSH_URL + API_DIRECTORY + hash + "/delete");
+        URL uri = new URL(serverApiUrl + hash + "/delete");
         Requester requester = new Requester(ConnectionType.GET, uri);
         requester.setRecieve(true);
         try {
@@ -463,7 +476,7 @@ public class JCrush {
     public static MediaCrushFile getFileStatus(String hash) throws IOException {
         Validator.validateNotNull(hash, "hash");
 
-        URL uri = new URL(MEDIA_CRUSH_URL + API_DIRECTORY + hash + "/status");
+        URL uri = new URL(serverApiUrl + hash + "/status");
         Requester requester = new Requester(ConnectionType.GET, uri);
         requester.setRecieve(true);
         requester.connect();
@@ -547,7 +560,7 @@ public class JCrush {
         Validator.validateNotNull(url, "url");
 
         String post = "url=" + url;
-        URL uri = new URL(MEDIA_CRUSH_URL + API_DIRECTORY + "upload/url");
+        URL uri = new URL(serverApiUrl + "upload/url");
         Requester requester = new Requester(ConnectionType.POST, uri);
         requester.setPostData(post);
         requester.addHeader("Content-Length", "" + post.length());

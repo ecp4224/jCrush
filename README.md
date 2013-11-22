@@ -12,6 +12,12 @@ JUnit 4 is used for unit testing and maven is used for building
 So just run 'mvn clean install' in the project's root directory to complie and test jCrush
 
 ##Usage and Examples
+
+###Initializing JCrush
+```java
+  JCrush.init("https://www.mediacru.sh/api/"); // Your server URL here
+```
+
 ###File Retrieving
 **Exposes** https://github.com/MediaCrush/MediaCrush/blob/master/docs/api.md#apihash
 ```java
