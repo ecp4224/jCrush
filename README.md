@@ -1,4 +1,4 @@
-#jCrush
+#jCrush [![Build Status](https://drone.io/github.com/hypereddie10/jCrush/status.png)](https://drone.io/github.com/hypereddie10/jCrush/latest)
 A java library for [mediacru.sh][1]
 
 
@@ -8,8 +8,8 @@ jCrush is a java library that exposes the HTTP API that [mediacru.sh][2] offers.
 
 
 ##Building and Testing
-JUnit 4 is using for unit testing and maven is used for building
-So just run 'mvn clean install' in the project's root directory.
+JUnit 4 is used for unit testing and maven is used for building
+So just run 'mvn clean install' in the project's root directory to complie and test jCrush
 
 ##Usage and Examples
 ###File Retrieving
@@ -105,7 +105,29 @@ You can also add unlimited parameters using the getFileInfos method
 ###File Uploading via URL
 **Exposes** https://github.com/MediaCrush/MediaCrush/blob/master/docs/api.md#apiuploadurl
 ```java
-  //Coming soon
+  try {
+      String newHash = JCrush.uploadFileViaURL("http://www.example.com/myimage.gif");
+  } catch (IOException e) {
+      //File uploading failed..
+	  return;
+  } catch (FileUploadFailedException e) {
+      //File failed to upload
+      //This exception is only thrown for one of the reasons specified in the API documentation
+      return;
+  }
+  
+  //OR
+  try {
+      URL url = new URL("http://www.example.com/myimage.gif");
+      String newHash = JCrush.uploadFileViaURL(url);
+  } catch (IOException e) {
+      //File uploading failed..
+	  return;
+  } catch (FileUploadFailedException e) {
+      //File failed to upload
+      //This exception is only thrown for one of the reasons specified in the API documentation
+      return;
+  }
 ```
 
 ###File Deleting
