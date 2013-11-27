@@ -33,16 +33,25 @@ public class JCrush {
 
     static {
         GSON = new Gson();
+        _setSystemProperties();
     }
 
     /**
-     * Initialize JCrush and configure the server URL where API resides. By default,
+     * Change the server URL where the API resides. By default,
      * it uses https://www.mediacru.sh/api
-     * @param serverApiUrl The URL where API waits for connections.
+     * @param serverApiUrl The URL where the API waits for connections.
      */
-    public static void init(String serverApiUrl) {
+    public static void changeApiURL(String serverApiUrl) {
     	JCrush.serverApiUrl = serverApiUrl;
-    	_setSystemProperties();
+    }
+
+    /**
+     * Get the server URL where the API resides. By default, it uses https://www.mediacru.sh/api
+     * @return
+     *        The URL where the API waits for connections.
+     */
+    public static String getApiURL() {
+        return serverApiUrl;
     }
     
     private static void _setSystemProperties() {
