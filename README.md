@@ -13,11 +13,6 @@ So just run 'mvn clean install' in the project's root directory to complie and t
 
 ##Usage and Examples
 
-###Initializing JCrush
-```java
-  JCrush.init("https://www.mediacru.sh/api/"); // Your server URL here
-```
-
 ###File Retrieving
 **Exposes** https://github.com/MediaCrush/MediaCrush/blob/master/docs/api.md#apihash
 ```java
@@ -190,6 +185,20 @@ https://github.com/MediaCrush/MediaCrush/blob/master/docs/api.md#apihashexists
 when the file does not exist. It allows infinate amount of parameters, and also allows a String array to be passed. 
 When one of the hash's specified does not exist, it's value in the array is just set to null. Unlike the getFile method, this method never
 throws an exception, if an exception was thrown, then it's value in the array is set to null.
+
+###Configuring JCrush
+
+
+####Changing the Server API URL
+Change the server URL where the API resides. By default,
+it uses https://www.mediacru.sh/api
+```java
+  JCrush.changeApiURL("https://www.mediacru.sh/api/"); // Your server URL here
+```
+
+####Setting JCrush to be async
+Coming soon
+
 
 ##License
 This project is Open Source under the MIT Open Source License.
