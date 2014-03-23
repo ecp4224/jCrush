@@ -1,5 +1,10 @@
 package jcrush.model;
 
+import com.google.gson.annotations.SerializedName;
+import com.google.gson.annotations.Since;
+import jcrush.JCrush;
+import jcrush.system.Versions;
+
 /**
  * {@link jcrush.model.MediaCrushFile} objects represent a file that has been crushed by MediaCrush. The object
  * contains the resulting files, along with flags, metadata, and other info about the file.
@@ -7,13 +12,17 @@ package jcrush.model;
  * @since API v1
  */
 public class MediaCrushFile {
-    private String hash;
-    private FileStatus status;
-    private double compression;
-    private String original;
-    private String type;
-    private FileType fileType;
-    private CrushedFile[] files;
+    @Since(Versions.VERSION_1)     private String hash;
+    @Since(Versions.VERSION_1)     private FileStatus status;
+    @Since(Versions.VERSION_1)     private double compression;
+    @Since(Versions.VERSION_1)     private String original;
+    @Since(Versions.VERSION_1)     private String type;
+    @Since(Versions.VERSION_1)     private CrushedFile[] files;
+
+    @Since(Versions.VERSION_2)     private String blob_type;
+    @Since(Versions.VERSION_2)     private CrushedFile[] extras;
+
+    private BlobType blobType;
     private CrushedFile orginalFile;
 
     private MediaCrushFile() { }
@@ -31,10 +40,12 @@ public class MediaCrushFile {
      * Returns the original file as a {@link jcrush.model.CrushedFile}
      * @return The orginal file
      * @since API v1
+     * @deprecated This method no longer works, as MediaCrush does not provide the type of the original file.
      */
+    @Deprecated
     public CrushedFile getOriginalFile() {
         if (orginalFile == null) {
-            orginalFile = new CrushedFile(original, type);
+            orginalFile = new CrushedFile(original, JCrush.getAPIVersion() == Versions.VERSION_1 ? type : blob_type);
         }
 
         return orginalFile;
@@ -65,6 +76,26 @@ public class MediaCrushFile {
      */
     public FileStatus getStatus() {
         return status == null ? FileStatus.DONE : status;
+    }
+
+    /**
+     * Get the {@link jcrush.model.BlobType} of this file.
+     * @return The {@link jcrush.model.BlobType} of this file.
+     * @since API v2
+     */
+    public BlobType getBlobType() {
+        if (blobType == null)
+            blobType = BlobType.fromString(blob_type);
+        return blobType;
+    }
+
+    /**
+     * Return any auxiliary files, such as a thumbnail or subtitles.
+     * @return Any auxiliary files, such as a thumbnail or subtitles.
+     * @since API v2
+     */
+    public CrushedFile[] getExtraFiles() {
+        return extras;
     }
 
     @Override

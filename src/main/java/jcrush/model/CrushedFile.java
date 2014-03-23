@@ -1,5 +1,10 @@
 package jcrush.model;
 
+import com.google.gson.annotations.SerializedName;
+import com.google.gson.annotations.Since;
+import jcrush.JCrush;
+import jcrush.system.Versions;
+
 import java.net.URL;
 
 /**
@@ -8,9 +13,10 @@ import java.net.URL;
  * @since API v1
  */
 public class CrushedFile {
-    private String file;
-    private String type;
-    private String url;
+    @Since(Versions.VERSION_1)                         private String file;
+    @Since(Versions.VERSION_1)                         private String type;
+    @Since(Versions.VERSION_2)                         private String url;
+    @Since(Versions.VERSION_2)                         private String path;
     private FileType fileType;
 
     private CrushedFile() {}
@@ -26,6 +32,7 @@ public class CrushedFile {
     @Deprecated
     public CrushedFile(String file, String type) {
         this.type = type;
+        this.path = file;
         this.file = file;
         this.fileType = FileType.toFileType(type);
     }
@@ -36,7 +43,8 @@ public class CrushedFile {
      * @since API v1
      */
     public String getFile() {
-        return file;
+        if (JCrush.getAPIVersion() == Versions.VERSION_1) return file;
+        return path;
     }
 
     /**

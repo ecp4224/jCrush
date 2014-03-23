@@ -1,5 +1,7 @@
 package jcrush.system;
 
+import static jcrush.system.Versions.*;
+
 public class Constants {
 
     /**
@@ -19,5 +21,5 @@ public class Constants {
      */
     public static final String CONTENT_DIVIDER = "plsrespond";
 
-    public static final double API_VERSION = 2.0;
+    public static final double API_VERSION = VERSION_2;
 }

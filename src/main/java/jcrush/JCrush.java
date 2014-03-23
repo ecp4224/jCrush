@@ -2,7 +2,6 @@ package jcrush;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.reflect.TypeToken;
 import jcrush.io.ConnectionType;
 import jcrush.io.Requester;
 import jcrush.model.FileStatus;
@@ -12,11 +11,8 @@ import jcrush.system.Validator;
 import jcrush.system.exceptions.FileUploadFailedException;
 
 import java.io.*;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Type;
 import java.net.URI;
 import java.net.URL;
-import java.util.HashMap;
 import java.util.Map;
 
 import static jcrush.system.Constants.*;

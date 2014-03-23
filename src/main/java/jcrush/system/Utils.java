@@ -25,34 +25,6 @@ public class Utils {
         f.set(file, status);
     }
 
-    //oh sweet jesus
-    public static MediaCrushFile convertMapToFile(Map map) throws IllegalAccessException, InstantiationException, NoSuchMethodException, InvocationTargetException, NoSuchFieldException {
-        Constructor<?> _construct = MediaCrushFile.class.getDeclaredConstructors()[0];
-        _construct.setAccessible(true);
-        MediaCrushFile file = (MediaCrushFile) _construct.newInstance();
-        for (Object key : map.keySet()) {
-            if (key.equals("files")) {
-                ArrayList<Map> files = (ArrayList<Map>) map.get(key);
-                ArrayList<CrushedFile> crushedFiles = new ArrayList<CrushedFile>();
-                for (Map m : files) {
-                    CrushedFile c = new CrushedFile((String)m.get("file"), (String)m.get("type"));
-                    crushedFiles.add(c);
-                }
-                Field f = MediaCrushFile.class.getDeclaredField("files");
-                f.setAccessible(true);
-                f.set(file, crushedFiles.toArray(new CrushedFile[crushedFiles.size()]));
-            } else {
-                try {
-                    Field f = MediaCrushFile.class.getDeclaredField(key.toString());
-                    f.setAccessible(true);
-                    f.set(file, map.get(key));
-                } catch (NoSuchFieldException ignored) { }
-            }
-        }
-
-        return file;
-    }
-
     public static void copy(InputStream input, OutputStream output, int bufferSize) throws IOException {
         byte[] buf = new byte[bufferSize];
         int bytesRead = input.read(buf);
