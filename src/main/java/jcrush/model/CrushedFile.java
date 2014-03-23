@@ -5,7 +5,7 @@ import java.net.URL;
 /**
  * A {@link jcrush.model.CrushedFile} is the result file from a file being crushed by MediaCrush <br></br>
  * This file can by any file type listed in {@link jcrush.model.FileType}. To determine the file type, invoke {@link CrushedFile#getFileType()}
- * @since apiv1
+ * @since API v1
  */
 public class CrushedFile {
     private String file;
@@ -21,7 +21,7 @@ public class CrushedFile {
      * @param type The file type as a {@link String}
      * @deprecated This method should <b>NOT</b> be used, as a {@link jcrush.model.CrushedFile} object should only be created by
      * {@link jcrush.model.MediaCrushFile} objects.
-     * @since apiv1
+     * @since API v1
      */
     @Deprecated
     public CrushedFile(String file, String type) {
@@ -33,7 +33,7 @@ public class CrushedFile {
     /**
      * Returns the file path of this {@link jcrush.model.CrushedFile}
      * @return The file path
-     * @since apiv1
+     * @since API v1
      */
     public String getFile() {
         return file;
@@ -42,7 +42,7 @@ public class CrushedFile {
     /**
      * Get the URL this {@link jcrush.model.CrushedFile} resides at.
      * @return Gets the URL of this {@link jcrush.model.CrushedFile} as a {@link String}
-     * @since apiv2
+     * @since API v2
      */
     public String getURL() {
         return url;
@@ -51,7 +51,7 @@ public class CrushedFile {
     /**
      * Get the file type this {@link jcrush.model.CrushedFile} is
      * @return The file type as a {@link jcrush.model.FileType} enum
-     * @since apiv1
+     * @since API v1
      */
     public FileType getFileType() {
         if (fileType == null)

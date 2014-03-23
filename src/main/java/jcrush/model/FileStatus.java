@@ -6,22 +6,22 @@ package jcrush.model;
 public enum FileStatus {
     /**
      * The file has been processed.
-     * @since apiv1
+     * @since API v1
      */
     DONE("done"),
     /**
      * The file is being processed or in the processing queue.
-     * @since apiv1
+     * @since API v1
      */
     PROCESSING("processing"),
     /**
      * The processing step finished early with an abnormal return code.
-     * @since apiv1
+     * @since API v1
      */
     ERROR("error"),
     /**
      * The file took too long to process.
-     * @since apiv1
+     * @since API v1
      */
     TIMEOUT("timeout");
 

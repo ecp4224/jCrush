@@ -18,7 +18,7 @@ import java.util.*;
 /**
  * A MediaCrush album
  *
- * @since apiv2
+ * @since API v2
  */
 public class Album {
     protected List<MediaCrushFile> files = new ArrayList<MediaCrushFile>();
@@ -27,14 +27,14 @@ public class Album {
 
     /**
      * Creates a new local album.
-     * @since apiv2
+     * @since API v2
      */
     public Album() { }
 
     /**
      * Create a new local album with the specified {@link jcrush.model.MediaCrushFile} objects added to it.
      * @param file The file(s) to add
-     * @since apiv2
+     * @since API v2
      */
     public Album(MediaCrushFile... file) {
         this(new ArrayList<MediaCrushFile>(Arrays.asList(file)));
@@ -43,7 +43,7 @@ public class Album {
     /**
      * Create a new local album with the specified {@link jcrush.model.MediaCrushFile} objects added to it.
      * @param files The file(s) to add
-     * @since apiv2
+     * @since API v2
      */
     public Album(List<MediaCrushFile> files) {
         this.files.addAll(files);
@@ -52,7 +52,7 @@ public class Album {
     /**
      * Whether or not this is a local album, that is, this album currently has no hash from MediaCrush.
      * @return true if this album has no hash
-     * @since apiv2
+     * @since API v2
      */
     public boolean isAlbumLocal() {
         return hash == null;
@@ -61,7 +61,7 @@ public class Album {
     /**
      * Whether or not this is album is read-only, that is, this album currently has a hash from MediaCrush.
      * @return true if this album has a hash
-     * @since apiv2
+     * @since API v2
      */
     public boolean isReadOnly() {
         return hash != null;
@@ -71,7 +71,7 @@ public class Album {
      * Get an read-only {@link java.util.List} of {@link jcrush.model.MediaCrushFile} objects in this {@link jcrush.model.Album} <br></br>
      * Attempts to modify the returned list, whether direct or via its iterator, result in an {@link java.lang.UnsupportedOperationException}. To add/remove files, please invoke {@link jcrush.model.Album#add} or {@link jcrush.model.Album#remove}
      * @return A read-only {@link java.util.List} of {@link jcrush.model.MediaCrushFile} objects
-     * @since apiv2
+     * @since API v2
      */
     public List<MediaCrushFile> getFiles() {
         return Collections.unmodifiableList(files);
@@ -86,7 +86,7 @@ public class Album {
      * @param file The {@link jcrush.model.MediaCrushFile} object to add
      * @return true (as specified by {@link java.util.Collection#add(Object)})
      * @throws java.lang.UnsupportedOperationException If this album is read-only
-     * @since apiv2
+     * @since API v2
      * @see java.util.List#add(Object)
      */
     public boolean add(MediaCrushFile file) {
@@ -106,7 +106,7 @@ public class Album {
      * @throws java.lang.UnsupportedOperationException If this album is read-only
      * @throws java.io.IOException As specified in {@link jcrush.JCrush#getFile(String)}
      * @throws java.io.FileNotFoundException If the hash specified was not found
-     * @since apiv2
+     * @since API v2
      * @see java.util.List#add(Object)
      * @see jcrush.JCrush#getFile(String)
      * @see jcrush.model.Album#add(MediaCrushFile)
@@ -129,7 +129,7 @@ public class Album {
      * @param file The file to remove
      * @return true if this {@link jcrush.model.Album} contained the specified element
      * @throws java.lang.UnsupportedOperationException If this album is read-only
-     * @since apiv2
+     * @since API v2
      */
     public boolean remove(MediaCrushFile file) {
         if (isReadOnly())
@@ -146,7 +146,7 @@ public class Album {
      * @param hash The hash as a {@link String} of the {@link jcrush.model.MediaCrushFile} object to search for and add
      * @return true if this {@link jcrush.model.Album} contained the specified element
      * @throws java.lang.UnsupportedOperationException If this album is read-only
-     * @since apiv2
+     * @since API v2
      */
     public boolean remove(String hash) {
         if (isReadOnly())
@@ -166,7 +166,7 @@ public class Album {
      * Get the hash for this album. This method will return null if {@link Album#isAlbumLocal()} returns true, that is, the current Album is
      * a local album and not on MediaCrush.
      * @return The hash for this album or null if {@link Album#commit} has not been called yet.
-     * @since apiv2
+     * @since API v2
      */
     public String getHash() {
         return hash;
@@ -176,7 +176,7 @@ public class Album {
      * Upload this {@link jcrush.model.Album} object to MediaCrush. <b>An album can only be committed once,</b> as calling commit multiple times
      * would create a new album each time. <br></br>
      * This method is synchronous, so the web request is made on the calling thread. If this is not desired, then please invoke {@link jcrush.model.Album#commitAsync}
-     * @since apiv2
+     * @since API v2
      */
     public void commit() throws IOException {
         if (!isAlbumLocal())
@@ -230,7 +230,7 @@ public class Album {
      * Upload this {@link jcrush.model.Album} object to MediaCrush. <b>An album can only be committed once,</b> as calling commit multiple times
      * would create a new album each time. <br></br>
      * This method is asynchronous, so the web request is made in a separate thread from the calling thread. If this is not desired, then please invoke {@link Album#commit()}
-     * @since apiv2
+     * @since API v2
      */
     public void commitAsync() {
         commitAsync(null, null);
@@ -243,7 +243,7 @@ public class Album {
      * The {@link java.lang.Runnable} object provided will be invoked when the web request is completed.
      * @param completedCallback The {@link java.lang.Runnable} object to invoke when the web request is complete. You may also specify null for none.
      * @param errorCallback The {@link jcrush.system.ErrorHandler} object to invoke when the web request fails. You may also specify null for none.
-     * @since apiv2
+     * @since API v2
      */
     public void commitAsync(final Runnable completedCallback, final ErrorHandler errorCallback) {
         new Thread(new Runnable() {
