@@ -6,7 +6,7 @@ package jcrush.model;
 public enum FileType {
     UNKNOWN("???", ".dat"),
     MP4("video/mp4", "mp4"),
-    OGV("video/ogv", "ogv"),
+    OGV("video/ogg", "ogv"),
     GIF("image/gif", "gif"),
     PNG("image/png", "png"),
     JPEG("image/jpg", "jpeg"),

@@ -2,6 +2,7 @@ package jcrush;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
 import jcrush.io.ConnectionType;
 import jcrush.io.Requester;
 import jcrush.model.FileStatus;
@@ -11,6 +12,7 @@ import jcrush.system.Validator;
 import jcrush.system.exceptions.FileUploadFailedException;
 
 import java.io.*;
+import java.lang.reflect.Type;
 import java.net.URI;
 import java.net.URL;
 import java.util.Map;
@@ -99,7 +101,7 @@ public class JCrush {
      *                    An {@link IOException} can be thrown for the following reasons: <br></br>
      *                    * There was an error invoking {@link jcrush.io.Requester#connect()} <br></br>
      *                    * The json returned contained a 404 error
-     * @see jcrush.JCrush#getFile(String) 
+     * @see jcrush.JCrush#getFile(String)
      * @since API v2
      * @deprecated This method is not used in API v2. Please use {@link jcrush.JCrush#getFile(String)}
      */
@@ -140,21 +142,7 @@ public class JCrush {
      * @since API v2
      */
     public static MediaCrushFile getFile(String hash) throws IOException {
-        if (!doesExists(hash))
-            return null;
-
-        MediaCrushFile file = getFileInfo(hash);
-        FileStatus status = getFileStatus(hash).getStatus();
-
-        try {
-            setStatus(file, status);
-        } catch (NoSuchFieldException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        }
-
-        return file;
+        return getFiles(hash)[0];
     }
 
     /**
@@ -189,13 +177,12 @@ public class JCrush {
         Validator.validateNot404(json);
 
         MediaCrushFile[] files = new MediaCrushFile[hash.length];
-        Map results = GSON.fromJson(json, Map.class);
+        Type typeOfMap = new TypeToken<Map<String, MediaCrushFile>>() { }.getType();
+        Map<String, MediaCrushFile> results = GSON.fromJson(json, typeOfMap);
         for (int i = 0; i < files.length; i++) {
             if (results.containsKey(hash[i])) {
-                Object obj = results.get(hash[i]);
-                if (obj instanceof MediaCrushFile)
-                    files[i] = (MediaCrushFile)obj;
-                else files[i] = null;
+                MediaCrushFile obj = results.get(hash[i]);
+                files[i] = obj;
             } else files[i] = null;
         }
 
