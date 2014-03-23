@@ -8,10 +8,14 @@ import jcrush.model.MediaCrushFile;
 
 import org.junit.Test;
 
+@Deprecated
 public class APITest {
     private static final String TEST_HASH = "CPvuR5lRhmS0";
 
-    @Test(expected = IOException.class)
+    public void uploadAlbum() {
+
+    }
+
     public void failedUploadFileTest() throws IOException {
         System.out.println("=== JCrush.uploadFile(File) ===");
 
@@ -19,8 +23,7 @@ public class APITest {
         JCrush.uploadFile(testFile);
         System.out.println("TEST COMPLETE");
     }
-    
-    //Removing test until issue #354 in MediaCrush is fixed
+
     public void uploadAndDeleteFile() throws IOException {
         System.out.println("=== JCrush.uploadFile(File) ===");
         System.out.println("=== JCrush.delete(String) ===");
@@ -32,7 +35,6 @@ public class APITest {
         System.out.println("TEST COMPLETE");
     }
 
-    //Removing test until issue #354 in MediaCrush is fixed
     public void uploadViaURL() throws IOException {
         System.out.println("=== JCrush.uploadFileViaURL(URL) ===");
         System.out.println("=== JCrush.uploadFileViaURL(String) ===");
@@ -47,14 +49,12 @@ public class APITest {
         System.out.println("TEST COMPLETE");
     }
 
-    @Test(expected = IOException.class)
     public void failedDeleteHashTest() throws IOException {
         System.out.println("=== JCrush.delete(String) ===");
 
         JCrush.delete(TEST_HASH);
     }
 
-    @Test(expected = IOException.class)
     public void failedDeleteFileTest() throws IOException {
         System.out.println("=== JCrush.delete(MediaCrushFile) ===");
 
@@ -63,7 +63,6 @@ public class APITest {
         JCrush.delete(file);
     }
 
-    @Test
     public void fileStatusTest() throws Exception {
         System.out.println("=== JCrush.getFileStatus(String) ===");
 
@@ -73,7 +72,8 @@ public class APITest {
 
         System.out.println("TEST COMPLETE");
     }
-    @Test
+
+
     public void fileExistsTest() throws Exception {
         System.out.println("=== JCrush.doesExists(String) ===");
         boolean result = JCrush.doesExists("aaaaa");
@@ -86,7 +86,7 @@ public class APITest {
 
         System.out.println("TEST COMPLETE");
     }
-    @Test
+
     public void fileTest() throws IOException {
         System.out.println("=== JCrush.getFileInfo(String) ===");
         MediaCrushFile m = JCrush.getFileInfo(TEST_HASH);
@@ -104,7 +104,6 @@ public class APITest {
         System.out.println("TEST COMPLETE");
     }
 
-    @Test
     public void multipleFileTest() throws IOException {
         System.out.println("=== JCrush.getFileInfos(String...) ===");
         MediaCrushFile[] files = JCrush.getFileInfos(TEST_HASH, "tVWMM_ziA3nm");
