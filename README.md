@@ -11,6 +11,9 @@ jCrush is a java library that exposes the HTTP API that [mediacru.sh][2] offers.
 JUnit 4 is used for unit testing and maven is used for building
 So just run 'mvn clean install' in the project's root directory to complie and test jCrush
 
+##Requesting new Features
+If this library ever gets out-of-date due to API updates to [mediacru.sh][1], simply open up an issue in the issue track with your feature request and support will be considered and added. Or, you could always fork and pull request.
+
 ##Usage and Examples
 
 ###File Retrieving
