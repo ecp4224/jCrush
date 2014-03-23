@@ -1,6 +1,7 @@
 package jcrush;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import jcrush.io.ConnectionType;
 import jcrush.io.Requester;
@@ -25,39 +26,67 @@ import static jcrush.system.Utils.*;
  * Static methods that expose the MediaCrush API
  */
 public class JCrush {
-	
-    private static final Gson GSON;
 
+    private static Gson GSON;
+    private static double version = API_VERSION;
     private static final String DEFAULT_SERVER_API_URL = MEDIA_CRUSH_URL + API_DIRECTORY;
     private static String serverApiUrl = DEFAULT_SERVER_API_URL;
 
     static {
-        GSON = new Gson();
+        GSON = new GsonBuilder().setVersion(version).create();
         _setSystemProperties();
     }
 
     /**
-     * Change the server URL where the API resides. By default,
-     * it uses https://www.mediacru.sh/api
+     * Change the server URL where the API resides. <br></br>
+     * By default, it uses {@link jcrush.system.Constants#MEDIA_CRUSH_URL} + {@link jcrush.system.Constants#API_DIRECTORY}.
      * @param serverApiUrl The URL where the API waits for connections.
+     * @since API v1
      */
     public static void changeApiURL(String serverApiUrl) {
-    	JCrush.serverApiUrl = serverApiUrl;
+        JCrush.serverApiUrl = serverApiUrl;
+    }
+
+    /**
+     * Get the current API version being used by {@link com.google.gson.Gson}.
+     * @return The current API version as a double
+     * @since API v2
+     * @see jcrush.JCrush#setAPIVersion(double)
+     */
+    public static double getAPIVersion() {
+        return version;
+    }
+
+    /**
+     * Set the API version used by {@link com.google.gson.Gson}. While this won't change the endpoints that jCrush uses, this <b>WILL</b> change
+     * the fields jCrush deserializes. This can be useful for mobile apps that don't have this extra data implemented yet. <br></br>
+     * The current API version is {@link jcrush.system.Constants#API_VERSION}.
+     * @param version The version to set it to
+     */
+    public static void setAPIVersion(double version) {
+        JCrush.version = version;
+        GSON = new GsonBuilder().setVersion(version).create();
     }
 
     /**
      * Get the server URL where the API resides. By default, it uses https://www.mediacru.sh/api
      * @return
      *        The URL where the API waits for connections.
+     * @since API v1
      */
     public static String getApiURL() {
         return serverApiUrl;
     }
 
+    /**
+     * Get the {@link com.google.gson.Gson} object that is used to parse the reposes from MediaCrush
+     * @return The {@link com.google.gson.Gson} object used
+     * @since API v2
+     */
     public static Gson getJsonParser() {
         return GSON;
     }
-    
+
     private static void _setSystemProperties() {
         System.setProperty("http.agent", DEFAULT_USER_AGENT);
     }
@@ -74,31 +103,13 @@ public class JCrush {
      *                    An {@link IOException} can be thrown for the following reasons: <br></br>
      *                    * There was an error invoking {@link jcrush.io.Requester#connect()} <br></br>
      *                    * The json returned contained a 404 error
-     * @see jcrush.io.Requester#connect()
+     * @see jcrush.JCrush#getFile(String) 
+     * @since API v2
+     * @deprecated This method is not used in API v2. Please use {@link jcrush.JCrush#getFile(String)}
      */
+    @Deprecated
     public static MediaCrushFile getFileInfo(String hash) throws IOException {
-        Validator.validateNotNull(hash, "hash");
-
-        URL uri = new URL(serverApiUrl + hash);
-        Requester requester = new Requester(ConnectionType.GET, uri);
-        requester.setRecieve(true);
-        requester.connect();
-
-        String json = requester.getResponse();
-        requester.disconnect();
-        Validator.validateNot404(json);
-
-        MediaCrushFile toreturn = GSON.fromJson(json, MediaCrushFile.class);
-
-        try {
-            setHash(toreturn, hash);
-        } catch (NoSuchFieldException e) {
-            throw new IOException("Hash could not be set for MediaCrushFile!", e);
-        } catch (IllegalAccessException e) {
-            throw new IOException("Hash could not be set for MediaCrushFile!", e);
-        }
-
-        return toreturn;
+        return getFile(hash);
     }
 
     /**
@@ -114,58 +125,23 @@ public class JCrush {
      *                    * There was an error invoking {@link jcrush.io.Requester#connect()} <br></br>
      *                    * The json returned contained a 404 error
      * @see jcrush.io.Requester#connect()
+     * @deprecated This method is no longer used in API v2. Please use {@link jcrush.JCrush#getFiles(String...)} instead.
      */
+    @Deprecated
     public static MediaCrushFile[] getFileInfos(String... hash) throws IOException {
-        Validator.validateNotNull(hash, "hash");
-
-        String list = "";
-        for (int i = 0; i < hash.length; i++) {
-            if (i == 0)
-                list = hash[i];
-            else
-                list += "," + hash[i];
-        }
-
-        URL uri = new URL(serverApiUrl + "info?list=" + list);
-        Requester requester = new Requester(ConnectionType.GET, uri);
-        requester.setRecieve(true);
-        requester.connect();
-
-        String json = requester.getResponse();
-        requester.disconnect();
-        Validator.validateNot404(json);
-
-        Type mapType = new TypeToken<HashMap<String, MediaCrushFile>>(){}.getType();
-        HashMap<String, MediaCrushFile> map = GSON.fromJson(json, mapType);
-
-        MediaCrushFile[] array = new MediaCrushFile[map.size()];
-        int i = 0;
-        for (String key : map.keySet()) {
-            try {
-                setHash(map.get(key), key);
-            } catch (NoSuchFieldException e) {
-                throw new IOException("Hash could not be set for MediaCrushFile \"" + key + "\"", e);
-            } catch (IllegalAccessException e) {
-                throw new IOException("Hash could not be set for MediaCrushFile \"" + key + "\"", e);
-            }
-            array[i] = map.get(key);
-            i++;
-        }
-
-        return array;
+        return getFiles(hash);
     }
 
     /**
-     * A convenience method. Returns a {@link MediaCrushFile} object with all info attached and does not throw an exception
-     * when the file does not exist. When the hash specified does not exist, this method simply returns null.
+     * A convenience method. Returns a single {@link MediaCrushFile} object. When the hash specified does not exist, this method simply returns null.
      * @param hash
      *            The hash to retrieve
      * @return
      *        The file represented as a {@link MediaCrushFile} object.
      * @throws IOException
      *                    This exception can be thrown if {@link JCrush#getFileInfo(String)} or {@link JCrush#getFileStatus(String)} throws an exception
-     * @see JCrush#getFileInfo(String)
-     * @see JCrush#getFileStatus(String)
+     * @see JCrush#getFiles(String...)
+     * @since API v2
      */
     public static MediaCrushFile getFile(String hash) throws IOException {
         if (!doesExists(hash))
@@ -186,36 +162,61 @@ public class JCrush {
     }
 
     /**
-     * A convenience method. Returns a {@link MediaCrushFile} object with all info attached and does not throw an exception
-     * when the file does not exist. When the hash specified does not exist, this method simply returns null. <br></br>
-     * If any file throws an {@link IOException}, then the exception is ignored and the file in the array is set to null.
+     * Returns an array of {@link MediaCrushFile} objects. If any of the hashes specified does not exist, then that item in the array will simply be null. <br></br>
      * @param hash
      *            The hash(s) to retrieve
      * @return
      *        The file(s) represented as an array of {@link MediaCrushFile} object(s).
+     * @throws IOException
+     *                    An {@link IOException} can be thrown for the following reasons: <br></br>
+     *                    * There was an error invoking {@link jcrush.io.Requester#connect()} <br></br>
+     *                    * The json returned contained a 404 error
+     * @since API v2
      */
-    public static MediaCrushFile[] getFiles(String... hash) {
+    public static MediaCrushFile[] getFiles(String... hash) throws IOException {
+        Validator.validateNotNull(hash, "hash");
+        String list = "";
+        for (int i = 0; i < hash.length; i++) {
+            if (i == 0)
+                list = hash[i];
+            else
+                list += "," + hash[i];
+        }
+
+        URL uri = new URL(serverApiUrl + "info?list=" + list);
+        Requester requester = new Requester(ConnectionType.GET, uri);
+        requester.setRecieve(true);
+        requester.connect();
+
+        String json = requester.getResponse();
+        requester.disconnect();
+        Validator.validateNot404(json);
+
         MediaCrushFile[] files = new MediaCrushFile[hash.length];
+        Map results = GSON.fromJson(json, Map.class);
         for (int i = 0; i < files.length; i++) {
-            try {
-                files[i] = getFile(hash[i]);
-            } catch (IOException e) {
-                files[i] = null;
-            }
+            if (results.containsKey(hash[i])) {
+                Object obj = results.get(hash[i]);
+                if (obj instanceof MediaCrushFile)
+                    files[i] = (MediaCrushFile)obj;
+                else files[i] = null;
+            } else files[i] = null;
         }
 
         return files;
     }
 
     /**
-     * Returns whether a hash exists or not.
+     * A convenience method. Returns whether a hash exists or not. <br></br>
+     * This method simply invokes {@link jcrush.JCrush#getFile(String)} and checks to see if the returned value is null or not.
      * @param hash
      *            The hash to lookup
      * @return
      *        true if the has exists or false if it does not
      * @throws IOException
-     *                    An {@link IOException} will be thrown if {@link jcrush.io.Requester#connect()} raises an exception
-     * @see jcrush.io.Requester#connect()
+     *                    An {@link IOException} will be thrown if {@link jcrush.JCrush#getFile(String)} raises an exception
+     * @see jcrush.JCrush#getFile(String)
+     * @since API v2
      */
     public static boolean doesExists(String hash) throws IOException {
         Validator.validateNotNull(hash, "hash");
@@ -244,6 +245,7 @@ public class JCrush {
      *                    * The file path specified does not exist  <br></br>
      *                    * {@link JCrush#uploadFile(java.io.File)} raises an Exception  <br></br>
      * @see JCrush#uploadFile(java.io.File)
+     * @since API v1
      */
     public static void uploadFile(String filePath) throws IOException {
         Validator.validateNotNull(filePath, "filePath");
@@ -285,6 +287,7 @@ public class JCrush {
      *                    * The file specified does not exist <br></br>
      *                    * The file specified is not a file, but a directory <br></br>
      *                    * An unknown error code was returned from the server <br></br>
+     * @since API v1
      */
     public static String uploadFile(File file) throws IOException {
         Validator.validateNotNull(file, "file");
@@ -337,6 +340,7 @@ public class JCrush {
      *                    * The file specified does not exist <br></br>
      *                    * The file specified is not a file, but a directory <br></br>
      *                    * An unknown error code was returned from the server <br></br>
+     * @since API v1
      */
     public static String uploadFile(InputStream imageData, FileType type, String fileName) throws IOException {
 
@@ -432,12 +436,13 @@ public class JCrush {
      *                    * The hash specified does not exist  <br></br>
      *                    * The IP does not match the stored hash <br></br>
      *                    * The server responded with an unknown error code. <br></br>
+     * @since API v1
      */
     public static void delete(String hash) throws IOException {
         Validator.validateNotNull(hash, "hash");
 
-        URL uri = new URL(serverApiUrl + hash + "/delete");
-        Requester requester = new Requester(ConnectionType.GET, uri);
+        URL uri = new URL(serverApiUrl + "files/" + hash);
+        Requester requester = new Requester(ConnectionType.DELETE, uri);
         requester.setRecieve(true);
         try {
             requester.connect();
@@ -468,6 +473,7 @@ public class JCrush {
      * @throws IOException
      *                    An IOException will only be thrown if {@link JCrush#delete(String)} throws an exception
      * @see JCrush#delete(String)
+     * @since API v1
      */
     public static void delete(MediaCrushFile file) throws IOException {
         Validator.validateNotNull(file, "file");
@@ -485,41 +491,13 @@ public class JCrush {
      *                   An IOException can be thrown for the following reasons: <br></br>
      *                   * {@link jcrush.io.Requester#connect()} throws an IOException
      *                   * There was an error constructing the {@link MediaCrushFile} file.
-     * @see jcrush.io.Requester#connect()
+     * @see jcrush.JCrush#getFile(String)
+     * @since API v2
+     * @deprecated This method is no longer used, because {@link jcrush.JCrush#getFile(String)} provides the file status in the returned object. Please use that method instead.
      */
+    @Deprecated
     public static MediaCrushFile getFileStatus(String hash) throws IOException {
-        Validator.validateNotNull(hash, "hash");
-
-        URL uri = new URL(serverApiUrl + hash + "/status");
-        Requester requester = new Requester(ConnectionType.GET, uri);
-        requester.setRecieve(true);
-        requester.connect();
-
-        String json = requester.getResponse();
-        requester.disconnect();
-        Validator.validateNot404(json);
-
-        Map map = GSON.fromJson(json, Map.class);
-
-        String statusString = (String) map.get("status");
-
-        try {
-            MediaCrushFile file = convertMapToFile((Map) map.get(hash));
-            setHash(file, hash);
-            setStatus(file, FileStatus.toFileStatus(statusString));
-
-            return file;
-        } catch (NoSuchFieldException e) {
-            throw new IOException("Error creating MediaCrushFile", e);
-        } catch (IllegalAccessException e) {
-            throw new IOException("Error creating MediaCrushFile", e);
-        } catch (InstantiationException e) {
-            throw new IOException("Error creating MediaCrushFile", e);
-        } catch (NoSuchMethodException e) {
-            throw new IOException("Error creating MediaCrushFile", e);
-        } catch (InvocationTargetException e) {
-            throw new IOException("Error creating MediaCrushFile", e);
-        }
+        return getFile(hash);
     }
     /**
      * Upload the file at a URL to mediacru.sh <br></br>
@@ -531,6 +509,7 @@ public class JCrush {
      * @throws IOException
      *                    An IOException will only be thrown if {@link JCrush#uploadFileViaURL(String)} throws an exception
      * @see JCrush#uploadFileViaURL(String)
+     * @since API v1
      */
     public static String uploadFileViaURL(URL url) throws IOException {
         Validator.validateNotNull(url, "url");
@@ -547,6 +526,7 @@ public class JCrush {
      * @throws IOException
      *                    An IOException will only be thrown if {@link JCrush#uploadFileViaURL(String)} throws an exception
      * @see JCrush#uploadFileViaURL(String)
+     * @since API v1
      */
     public static String uploadFileViaURL(URI uri) throws IOException {
         Validator.validateNotNull(uri, "uri");
@@ -569,6 +549,7 @@ public class JCrush {
      * @throws IOException
      *                    An IOException can be thrown for the following reasons:<br></br>
      *                    * An unknown error code was returned from the server <br></br>
+     * @since API v1
      */
     public static String uploadFileViaURL(String url) throws IOException {
         Validator.validateNotNull(url, "url");

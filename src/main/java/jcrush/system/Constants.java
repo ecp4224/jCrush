@@ -18,4 +18,6 @@ public class Constants {
      * The divider used when uploading files
      */
     public static final String CONTENT_DIVIDER = "plsrespond";
+
+    public static final double API_VERSION = 2.0;
 }
