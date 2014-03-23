@@ -13,7 +13,7 @@ public class Constants {
     /**
      * The directory where all API endpoints are located
      */
-    public static final String API_DIRECTORY = "/api/v2";
+    public static final String API_DIRECTORY = "/api/";
     /**
      * The divider used when uploading files
      */
