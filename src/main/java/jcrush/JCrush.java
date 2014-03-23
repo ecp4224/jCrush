@@ -53,6 +53,10 @@ public class JCrush {
     public static String getApiURL() {
         return serverApiUrl;
     }
+
+    public static Gson getJsonParser() {
+        return GSON;
+    }
     
     private static void _setSystemProperties() {
         System.setProperty("http.agent", DEFAULT_USER_AGENT);
