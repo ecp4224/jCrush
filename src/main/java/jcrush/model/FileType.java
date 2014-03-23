@@ -1,5 +1,8 @@
 package jcrush.model;
 
+/**
+ * All possible file types MediaCrush supports as an enum
+ */
 public enum FileType {
     UNKNOWN("???", ".dat"),
     MP4("video/mp4", "mp4"),
