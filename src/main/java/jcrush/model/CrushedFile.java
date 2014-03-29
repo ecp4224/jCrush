@@ -1,9 +1,13 @@
 package jcrush.model;
 
+import java.net.MalformedURLException;
+import java.net.URL;
+
 public class CrushedFile {
     private String file;
     private String type;
     private FileType fileType;
+    private String url;
 
     private CrushedFile() {}
 
@@ -15,6 +19,19 @@ public class CrushedFile {
 
     public String getFile() {
         return file;
+    }
+
+    public URL getURL() {
+        try {
+            return new URL(url);
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public String getURLAsString() {
+        return url;
     }
 
     public FileType getFileType() {
