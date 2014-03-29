@@ -5,6 +5,7 @@ import com.google.gson.annotations.Since;
 import jcrush.JCrush;
 import jcrush.system.Versions;
 
+import java.net.MalformedURLException;
 import java.net.URL;
 
 /**
@@ -48,12 +49,26 @@ public class CrushedFile {
     }
 
     /**
-     * Get the URL this {@link jcrush.model.CrushedFile} resides at.
+     * Get the URL this {@link jcrush.model.CrushedFile} resides.
      * @return Gets the URL of this {@link jcrush.model.CrushedFile} as a {@link String}
-     * @since API v2
+     * @since API v1
      */
-    public String getURL() {
+    public String getURLAsString() {
         return url;
+    }
+
+    /**
+     * Get the URL this {@link jcrush.model.CrushedFile} resides.
+     * @return Gets the URL of this {@link jcrush.model.CrushedFile} as a {@link java.net.URL} object
+     * @since API v1
+     */
+    public URL getURL() {
+        try {
+            return new URL(url);
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     /**
